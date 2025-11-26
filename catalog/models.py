@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 import uuid
+from django.contrib.auth.models import User
+from datetime import date
 class Genre(models.Model):
     """
     Model representing a book genre (e.g. Science Fiction, Non Fiction).
@@ -19,13 +21,18 @@ class Book(models.Model):
     """
     title = models.CharField(max_length=200)
     author = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
-    # Foreign Key used because book can only have one author, but authors can have multiple books
-    # Author as a string rather than object because it hasn't been declared yet in the file.
+
     summary = models.TextField(max_length=1000, help_text="Enter a brief description of the book")
     isbn = models.CharField('ISBN',max_length=13, help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn">ISBN number</a>')
     genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
-    # ManyToManyField used because genre can contain many books. Books can cover many genres.
-    # Genre class has already been defined so we can specify the object above.
+
+    def display_genre(self):
+        """
+        Creates a string for the Genre. This is required to display genre in Admin.
+        """
+        return ', '.join([genre.name for genre in self.genre.all()[:3]])
+
+    display_genre.short_description = 'Genre'
 
     def __str__(self):
         """
@@ -60,13 +67,15 @@ class BookInstance(models.Model):
 
     class Meta:
         ordering = ["due_back"]
-
+        permissions = (("can_mark_returned", "Set book as returned"),)
 
     def __str__(self):
         """
         String for representing the Model object
         """
         return '%s (%s)' % (self.id,self.book.title)
+
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
 class Author(models.Model):
     """
@@ -83,9 +92,16 @@ class Author(models.Model):
         """
         return reverse('author-detail', args=[str(self.id)])
 
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
+
 
     def __str__(self):
         """
         String for representing the Model object.
         """
         return '%s, %s' % (self.last_name, self.first_name)
+
