@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>{% if object %}Update{% else %}Create{% endif %} Book</h1>
+
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Submit" class="btn btn-primary">
+    <a href="{% url 'books' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+
+  <style>
+    table {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    table td {
+      padding: 8px;
+      vertical-align: top;
+    }
+    table td:first-child {
+      width: 150px;
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+{% endblock %}
+</body>
+</html>

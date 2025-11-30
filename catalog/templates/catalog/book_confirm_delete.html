@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Delete Book</h1>
+
+  <p>Are you sure you want to delete the book: <strong>{{ book }}</strong>?</p>
+
+  <form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Yes, delete" class="btn btn-danger">
+    <a href="{{ book.get_absolute_url }}" class="btn btn-secondary">Cancel</a>
+  </form>
+
+  <div class="mt-4">
+    <h5>Book Details:</h5>
+    <ul>
+      <li><strong>Title:</strong> {{ book.title }}</li>
+      <li><strong>Author:</strong> {{ book.author }}</li>
+      <li><strong>ISBN:</strong> {{ book.isbn }}</li>
+    </ul>
+  </div>
+{% endblock %}
+</body>
+</html>
