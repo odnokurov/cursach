@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Book Copies List</h1>
+  {% if bookinstance_list %}
+    <ul>
+      {% for bookinst in bookinstance_list %}
+        <li>
+          <strong>Book:</strong> {{ bookinst.book.title }}<br>
+          <strong>Status:</strong> {{ bookinst.status }}<br>
+          <strong>Due back:</strong> {{ bookinst.due_back }}<br>
+          <strong>ID:</strong> {{ bookinst.id }}
+        </li>
+        <hr>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no book copies.</p>
+  {% endif %}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>All Borrowed Books</h1>
+
+  {% if perms.catalog.can_mark_returned %}
+    <div class="alert alert-info">
+      <strong>Librarian View:</strong> You can manage borrowed books here.
+    </div>
+  {% endif %}
+
+  {% if bookinstance_list %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>Book Title</th>
+            <th>Author</th>
+            <th>Borrower</th>
+            <th>Due Back</th>
+            <th>ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bookinst in bookinstance_list %}
+            <tr class="{% if bookinst.is_overdue %}table-warning{% endif %}">
+              <td><a href="{{ bookinst.book.get_absolute_url }}">{{ bookinst.book.title }}</a></td>
+              <td>{{ bookinst.book.author }}</td>
+              <td>{{ bookinst.borrower.get_username|default:"Unknown" }}</td>
+              <td>{{ bookinst.due_back }}</td>
+              <td>{{ bookinst.id }}</td>
+              <td>
+                {% if perms.catalog.can_mark_returned %}
+                  <a href="{% url 'renew-book-librarian' bookinst.id %}" class="btn btn-sm btn-primary">Renew</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-success">
+      <p>There are no books currently borrowed.</p>
+    </div>
+  {% endif %}
+{% endblock %}
+</body>
+</html>

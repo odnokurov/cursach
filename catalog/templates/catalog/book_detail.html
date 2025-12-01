@@ -27,6 +27,17 @@
     <p class="text-muted"><strong>Id:</strong> {{copy.id}}</p>
     {% endfor %}
   </div>
+      {% if perms.catalog.change_book or perms.catalog.delete_book %}
+    <div class="mt-4">
+      <h4>Book Management</h4>
+      {% if perms.catalog.change_book %}
+        <a href="{% url 'book-update' book.pk %}" class="btn btn-primary">Update Book</a>
+      {% endif %}
+      {% if perms.catalog.delete_book %}
+        <a href="{% url 'book-delete' book.pk %}" class="btn btn-danger">Delete Book</a>
+      {% endif %}
+    </div>
+  {% endif %}
 {% endblock %}
 </body>
 </html>
