@@ -9,9 +9,8 @@
 
 {% block content %}
   <h1>Author: {{ author }}</h1>
-  <p><strong>Date of birth:</strong> {{ author.date_of_birth }}</p>
-  {% if author.date_of_death %}
-    <p><strong>Date of death:</strong> {{ author.date_of_death }}</p>
+{% if author.date_of_death %}
+  <p>{{ author.date_of_birth }} - {{ author.date_of_death }}</p>
   {% endif %}
 
   <div style="margin-left:20px;margin-top:20px">
@@ -21,8 +20,8 @@
       <ul>
         {% for book in author.book_set.all %}
           <li>
-            <strong><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></strong> ({{ book.id }})<br>
-            <strong>Summary:</strong> {{ book.summary }}
+            <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{ book.id }})<br>
+            <p>{{ book.summary }}</p>
           </li>
           <hr>
         {% endfor %}
