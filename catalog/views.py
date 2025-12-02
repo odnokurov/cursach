@@ -1,13 +1,11 @@
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 from .models import Book, Author, BookInstance, Genre
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
-import datetime
 from .forms import RenewBookForm
+import datetime
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
@@ -24,7 +22,7 @@ class BookDetailView(generic.DetailView):
 
 class BookListView(generic.ListView):
     model = Book
-    paginate_by = 10
+    paginate_by = 1
 
 class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
     """
@@ -32,7 +30,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
     """
     model = BookInstance
     template_name ='catalog/bookinstance_list_borrowed_user.html'
-    paginate_by = 10
+    paginate_by = 1
 
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
@@ -53,7 +51,7 @@ def index(request):
     num_genres = Genre.objects.all().count()
 
     # Количество книг, содержащих определенное слово в заголовке (без учета регистра)
-    search_word = request.GET.get('search', 'war')
+    search_word = request.GET.get('search', 'how')
     num_books_with_word = Book.objects.filter(
         Q(title__icontains=search_word) | Q(summary__icontains=search_word)
     ).count()
@@ -77,7 +75,7 @@ def index(request):
 
 class AuthorListView(generic.ListView):
     model = Author
-    paginate_by = 10  # Пагинация по 10 авторов на странице
+    paginate_by = 1  # Пагинация по 10 авторов на странице
     template_name = 'catalog/author_list.html'
     context_object_name = 'author_list'
 
@@ -89,7 +87,7 @@ class AllBorrowedBooksListView(PermissionRequiredMixin, generic.ListView):
     model = BookInstance
     permission_required = 'catalog.can_mark_returned'
     template_name = 'catalog/all_borrowed_books.html'
-    paginate_by = 10
+    paginate_by = 1
 
     def get_queryset(self):
         # Получаем только взятые книги (статус 'o' - on loan)
@@ -104,8 +102,14 @@ def renew_book_librarian(request, pk):
             book_instance.due_back = form.cleaned_data['due_back']
             book_instance.save()
             return redirect('all-borrowed')
-    else:
-        form = RenewBookForm()
+        else:
+            proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+            form = RenewBookForm(initial={'due_back': proposed_renewal_date})
+
+        context = {
+            'form': form,
+            'book_instance': book_instance,
+        }
 
     return render(request, 'catalog/book_renew_librarian.html', {'form': form, 'book_instance': book_instance})
 class AuthorCreate(PermissionRequiredMixin, CreateView):

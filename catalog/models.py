@@ -71,6 +71,12 @@ class BookInstance(models.Model):
 
     borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
+
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
